@@ -13,53 +13,43 @@ chat_history = []
 #         file.save(f"./uploads/{file.filename}")
 #     return jsonify({"message": "File uploaded successfully", "text": text})
 
-# import requests
-
-# url = "https://api.sync.so/v2/generate"
-
-# payload = {
-#     "model": "lipsync-1.7.1",
-#     "input": [
-#         {
-#             "type": "video",
-#             "url": "https://example.com/your-video.mp4"
-#         },
-#         {
-#             "type": "audio",
-#             "url": "https://example.com/your-audio.mp3"
-#         }
-#     ],
-#     "options": {"pads":[0,5,0,0],"output_format":"mp4","sync_mode":"silence","active_speaker":false},
-#     "webhookUrl": "https://your-server.com/webhook"
-# }
-# headers = {
-#     "x-api-key": "<api-key>",
-#     "Content-Type": "application/json"
-# }
-
-# response = requests.request("POST", url, json=payload, headers=headers)
-
-# print(response.text)
-
 @app.route('/api/chat', methods=['POST'])
 def chat_handler():
     medium = request.form.get('medium') # "medium" should either be "text", "audio", or "video"
     prompt = request.form.get('prompt') # "prompt" should be plaintext that the user enters in the chat box
 
+    # parameter validation
+    if not medium or medium not in ["text", "audio", "video"]:
+        return jsonify({"error": "Invalid 'medium' parameter. Accepted values are 'text', 'audio', or 'video'."}), 400
+
+    if not prompt:
+        return jsonify({"error": "Missing 'prompt' parameter."}), 400
+
     # acquire response from an LLM (abstract out the actual prompting logic) and update chat history
     text_response, hist_record = llm.get_response(history=chat_history, prompt=prompt) 
     chat_history += hist_record
+
+    # TODO: optionally filter out non-text characters (LLM could accidentally include formatting)
 
     response = {
         "text_response": text_response,
         "file": None
     }
-    
-    return jsonify(response)
-    # TODO: optionally filter out non-text characters (LLM could accidentally include formatting)
 
-    # acquire tts by feeding in the text_response to our TTS API
-    dummy_output = None
+    if medium == "text":
+        return jsonify(response)
+    elif medium == "audio":
+        # acquire tts by feeding in the text_response to our TTS API
+        dummy_output = None
+    elif medium == "video":
+        # acquire tts by feeding in the text_response to our TTS API
+        dummy_output = None
+        # acquire video by feeding the TTS audio and one of our hosted videos into our LipSync API
+        dummy_output2 = None
+
+
+
+    
 
 
 if __name__ == '__main__':
