@@ -2,9 +2,17 @@
 venv
 venv/*
 
+# env folder
+env
+env/*
+
 # .env 
 .env
 
 # file uploads
 uploads
 uploads/*
+
+# pycache
+__pycache__
+__pycache__/*

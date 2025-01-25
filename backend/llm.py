@@ -22,8 +22,8 @@ def get_response(history: list[dict[str, str]], prompt: str) -> ChatCompletion:
     messages = construct_chat_history(history, prompt)
 
     # testing
-    for msg in messages:
-        print(msg)
+    # for msg in messages:
+    #     print(msg)
     
     completion = client.chat.completions.create(
         model="gpt-4o-mini",
