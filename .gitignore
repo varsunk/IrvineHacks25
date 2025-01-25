@@ -1,0 +1,10 @@
+# virtual env
+venv
+venv/*
+
+# .env 
+.env
+
+# file uploads
+uploads
+uploads/*
