@@ -15,7 +15,7 @@ chat_history = []
 #         file.save(f"./uploads/{file.filename}")
 #     return jsonify({"message": "File uploaded successfully", "text": text})
 
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5172"}})
+CORS(app, resources={r"/api/*": {"origins": "http://localhost:5174"}})
 
 
 @app.route('/api/chat', methods=['POST'])
