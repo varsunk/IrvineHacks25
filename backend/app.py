@@ -3,6 +3,8 @@ import llm
 
 app = Flask(__name__)
 
+chat_history = []
+
 # @app.route('/api/upload', methods=['POST'])
 # def upload_file():
 #     text = request.form.get('text')
@@ -41,16 +43,17 @@ app = Flask(__name__)
 
 @app.route('/api/chat', methods=['POST'])
 def chat_handler():
-    medium = request.form.get('medium') # "medium" should either be "audio" or "video"
+    medium = request.form.get('medium') # "medium" should either be "text", "audio", or "video"
     prompt = request.form.get('prompt') # "prompt" should be plaintext that the user enters in the chat box
 
-    # acquire response from an LLM (abstract out the actual prompting logic)
-    text_response = llm.get_response(prompt=prompt) 
+    # acquire response from an LLM (abstract out the actual prompting logic) and update chat history
+    text_response, hist_record = llm.get_response(history=chat_history, prompt=prompt) 
+    chat_history += hist_record
 
-    # TODO: optionally filter out non-text characters (LLM could accidentally include formatting chars)
+    # TODO: optionally filter out non-text characters (LLM could accidentally include formatting)
 
     # acquire tts by feeding in the text_response to our TTS API
-    dummy_output = 
+    dummy_output = None
 
 
 if __name__ == '__main__':
