@@ -50,6 +50,12 @@ def chat_handler():
     text_response, hist_record = llm.get_response(history=chat_history, prompt=prompt) 
     chat_history += hist_record
 
+    response = {
+        "text_response": text_response,
+        "file": None
+    }
+    
+    return jsonify(response)
     # TODO: optionally filter out non-text characters (LLM could accidentally include formatting)
 
     # acquire tts by feeding in the text_response to our TTS API

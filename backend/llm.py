@@ -17,6 +17,8 @@ client = OpenAI(
     Defines a method to send chat history and a prompt to an OpenAI LLM. The LLM responds in-character as LeBron James (but in the context of being a therapist).
 '''
 def get_response(history: list[dict[str, str]], prompt: str) -> ChatCompletion:
+    # TODO: optionally protect against prompts that cause the LLM to not respond to messages?
+    
     messages = construct_chat_history(history, prompt)
 
     # testing
