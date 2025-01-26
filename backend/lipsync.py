@@ -20,6 +20,7 @@ headers = {
 }
 
 def generate_lipsync(tts_url: str):
+    print("tts url:", tts_url)
     payload = {
         "model": "lipsync-1.7.1",
         "input": [
@@ -42,7 +43,7 @@ def generate_lipsync(tts_url: str):
     }
 
     response = requests.request("POST", URL, json=payload, headers=headers)
-
+    print(response.json())
     return response
 
 """

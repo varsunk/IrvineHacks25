@@ -17,12 +17,16 @@ pending_jobs = {}
 #         file.save(f"./uploads/{file.filename}")
 #     return jsonify({"message": "File uploaded successfully", "text": text})
 
-CORS(app, resources={r"/api/*": {"origins": "http://localhost:5174"}})
+# CORS(app, resources={r"/api/*": {"origins": "http://localhost:5174"}})
+CORS(app)
 
 
-@app.route('/api/chat', methods=['POST'])
+@app.route('/api/chat', methods=['POST', 'OPTIONS'])
 def chat_handler():
     global chat_history, pending_jobs
+    
+    if request.method == 'OPTIONS':
+        return '', 200  # Handle preflight request
     
     data = request.get_json()  # Get the JSON body as a dictionary
 
@@ -67,18 +71,21 @@ def chat_handler():
         tts_file = tts.generate_tts(text_response)
         lipsync_response = lipsync.generate_lipsync(tts_file)
 
-        if lipsync_response.status_code == 200:
+        if lipsync_response.status_code == 200 or lipsync_response.status_code == 201:
+            print("successfully requested video")
             # Parse the job ID from the response
-            job_id = lipsync_response.json().get('job_id')
+            job_id = lipsync_response.json().get('id')
             pending_jobs[job_id] = {"status": "processing", "file_url": None}
             return jsonify({"text_response": text_response, "job_id": job_id})
         else:
+            print("video gen failed")
             return jsonify({"error": "Failed to initiate video generation."}), 500
 
 
 @app.route('/api/webhook', methods=['POST'])
 def webhook():
     data = request.get_json()
+    print("webhook response\n", data)
     signature = request.headers.get('Sync-Signature')
 
     # Verify webhook signature
@@ -87,6 +94,9 @@ def webhook():
 
     job_id = data.get('id')
     file_url = data.get('outputUrl')
+
+    print("job id:", job_id)
+    print("file url:", file_url)
 
     if job_id in pending_jobs:
         pending_jobs[job_id]["status"] = "completed"
@@ -97,6 +107,7 @@ def webhook():
 
 @app.route('/api/status/<job_id>', methods=['GET'])
 def get_status(job_id):
+    print(pending_jobs)
     if job_id not in pending_jobs:
         return jsonify({"error": "Job ID not found"}), 404
     return jsonify(pending_jobs[job_id])
