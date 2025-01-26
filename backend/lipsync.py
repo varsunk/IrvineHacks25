@@ -5,9 +5,11 @@ import re
 import hashlib
 import hmac
 import json
+import os
 
 # Obtain environment variables
-env_vars = dotenv.dotenv_values()
+# env_vars = dotenv.dotenv_values()
+env_vars = dict(os.environ)
 URL = "https://api.sync.so/v2/generate"
 API_KEY = env_vars['SYNC_API_KEY']
 WEBHOOK_SECRET = env_vars['WEBHOOK_SECRET']

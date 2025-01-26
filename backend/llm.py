@@ -1,9 +1,11 @@
 from openai import OpenAI
 from openai.types.chat import ChatCompletion
-import dotenv 
+# import dotenv 
+import os
 
 # Obtain environment variables
-env_vars = dotenv.dotenv_values()
+# env_vars = dotenv.dotenv_values()
+env_vars = dict(os.environ)
 API_KEY = env_vars['OPENAI_API_KEY']
 SYSTEM_PROMPT = env_vars['CHAT_SYSTEM_PROMPT']
 CONV_HISTORY_LIMIT = int(env_vars['CONVERSATION_HISTORY_MSG_LIMIT'])

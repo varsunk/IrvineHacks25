@@ -1,9 +1,11 @@
 import requests
 import boto3
+import os
 import dotenv
 
 # Obtain environment variables
-env_vars = dotenv.dotenv_values()
+# env_vars = dotenv.dotenv_values()
+env_vars = dict(os.environ)
 URL = "https://api.play.ht/api/v2/tts/stream"
 X_USER_ID = env_vars['X_USER_ID']
 X_AUTH = env_vars['X_AUTH']
