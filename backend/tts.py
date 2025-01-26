@@ -1,7 +1,6 @@
 import requests
 import boto3
 import dotenv
-import os
 
 # Obtain environment variables
 env_vars = dotenv.dotenv_values()

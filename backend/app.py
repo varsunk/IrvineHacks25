@@ -1,11 +1,13 @@
 from flask import Flask, request, jsonify
 import llm
 import tts
+import lipsync
 from flask_cors import CORS
 
 app = Flask(__name__)
 
 chat_history = []
+pending_jobs = {}
 
 # @app.route('/api/upload', methods=['POST'])
 # def upload_file():
@@ -20,7 +22,7 @@ CORS(app, resources={r"/api/*": {"origins": "http://localhost:5174"}})
 
 @app.route('/api/chat', methods=['POST'])
 def chat_handler():
-    global chat_history
+    global chat_history, pending_jobs
     
     data = request.get_json()  # Get the JSON body as a dictionary
 
@@ -62,13 +64,42 @@ def chat_handler():
         return jsonify(response)
     elif medium == "video":
         # acquire tts by feeding in the text_response to our TTS API
-        dummy_output = None
-        # acquire video by feeding the TTS audio and one of our hosted videos into our LipSync API
-        dummy_output2 = None
+        tts_file = tts.generate_tts(text_response)
+        lipsync_response = lipsync.generate_lipsync(tts_file)
+
+        if lipsync_response.status_code == 200:
+            # Parse the job ID from the response
+            job_id = lipsync_response.json().get('job_id')
+            pending_jobs[job_id] = {"status": "processing", "file_url": None}
+            return jsonify({"text_response": text_response, "job_id": job_id})
+        else:
+            return jsonify({"error": "Failed to initiate video generation."}), 500
 
 
+@app.route('/api/webhook', methods=['POST'])
+def webhook():
+    data = request.get_json()
+    signature = request.headers.get('Sync-Signature')
 
-    
+    # Verify webhook signature
+    if not lipsync.verify_signature(data, signature):
+        return jsonify({'message': 'Invalid signature'}), 400
+
+    job_id = data.get('id')
+    file_url = data.get('outputUrl')
+
+    if job_id in pending_jobs:
+        pending_jobs[job_id]["status"] = "completed"
+        pending_jobs[job_id]["file_url"] = file_url
+
+    return jsonify({'message': 'Webhook processed successfully'}), 200
+
+
+@app.route('/api/status/<job_id>', methods=['GET'])
+def get_status(job_id):
+    if job_id not in pending_jobs:
+        return jsonify({"error": "Job ID not found"}), 404
+    return jsonify(pending_jobs[job_id])
 
 
 if __name__ == '__main__':
