@@ -1,0 +1,19 @@
+# Flask and CORS support
+flask==2.3.2
+flask-cors==3.0.10
+
+# Requests library for HTTP requests
+requests==2.31.0
+
+# dotenv for managing environment variables
+python-dotenv==1.0.0
+
+# boto3 for AWS S3 interaction
+boto3==1.28.28
+botocore==1.31.28
+
+# Any required OpenAI Python library (used in llm.py)
+openai==0.28.0
+
+# For cryptographic functions in lipsync.py
+cryptography==41.0.3
